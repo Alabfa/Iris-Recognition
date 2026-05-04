@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 — Iris Recognition | Biometric Systems</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #0d2137;
+    --teal: #1a6b6b;
+    --teal-light: #2a9d8f;
+    --accent: #e9c46a;
+    --red: #e63946;
+    --text: #1a1a2e;
+    --muted: #4a5568;
+    --bg: #f4f6f9;
+    --white: #ffffff;
+    --border: #d1dbe8;
+    --card-bg: #eef2f7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* COVER */
+  .cover {
+    background: var(--navy);
+    color: white;
+    padding: 40px 48px 32px;
+    border-bottom: 4px solid var(--teal-light);
+  }
+  .cover .ch-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--teal-light);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .cover h1 { font-size: 32px; font-weight: 700; margin-bottom: 6px; }
+  .cover .subtitle { font-size: 15px; color: #a0c4d8; margin-bottom: 4px; }
+  .cover .instructor { font-size: 13px; color: #6b8faf; }
+  .cover-toc {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;
+  }
+  .toc-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #c8dde8;
+  }
+
+  /* SECTION WRAPPERS */
+  .section {
+    border-top: 3px solid var(--teal);
+    margin: 32px 24px;
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .section-header {
+    background: var(--navy);
+    color: white;
+    padding: 12px 20px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .section-header .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-light);
+    letter-spacing: 1px;
+  }
+  .section-header h2 { font-size: 16px; font-weight: 600; }
+  .section-body { padding: 20px; }
+
+  /* FOOTER BANNER */
+  .key-banner {
+    background: var(--teal);
+    color: white;
+    padding: 9px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .key-banner.red { background: var(--red); }
+  .key-banner.accent { background: #b5860d; }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card-bg);
+    border-left: 4px solid var(--teal);
+    border-radius: 4px;
+    padding: 12px 14px;
+  }
+  .card.dark {
+    background: var(--navy);
+    color: white;
+    border-left-color: var(--teal-light);
+  }
+  .card.accent-left { border-left-color: var(--accent); }
+  .card.red-left { border-left-color: var(--red); }
+  .card h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--teal); }
+  .card.dark h4 { color: var(--teal-light); }
+  .card p, .card li { font-size: 12.5px; color: var(--muted); margin-bottom: 3px; }
+  .card.dark p, .card.dark li { color: #b0c8d8; }
+  .card ul { padding-left: 16px; }
+  .card .num-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--teal); color: white;
+    font-size: 11px; font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card.dark .num-badge { background: var(--teal-light); }
+
+  /* NUMBERED STEPS */
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    background: var(--teal); color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* TERM TABLE */
+  .term-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .term-table tr { border-bottom: 1px solid var(--border); }
+  .term-table td { padding: 6px 10px; vertical-align: top; }
+  .term-table td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: var(--teal);
+    white-space: nowrap;
+    width: 120px;
+  }
+
+  /* EQUATION BOX */
+  .eq-box {
+    background: var(--navy);
+    color: #e0f0ff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 12px 18px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--accent);
+  }
+  .eq-box .eq-label {
+    font-size: 10px; color: var(--accent); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+
+  /* FEATURE LIST */
+  .feature-list { list-style: none; padding: 0; }
+  .feature-list li {
+    padding: 6px 0 6px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    position: relative;
+  }
+  .feature-list li:before {
+    content: '';
+    position: absolute; left: 0; top: 13px;
+    width: 6px; height: 6px;
+    background: var(--teal-light);
+    border-radius: 50%;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list li strong { color: var(--teal); font-weight: 600; }
+
+  /* WARNING BOX */
+  .warning-box {
+    background: #fff5f5;
+    border: 2px solid var(--red);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: #7b1d1d;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    background: #f0fbf9;
+    border: 1px solid var(--teal-light);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: var(--teal);
+    margin-bottom: 14px;
+  }
+
+  /* INLINE LABEL */
+  .label {
+    display: inline-block;
+    background: var(--teal);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+  .label.red { background: var(--red); }
+  .label.accent { background: var(--accent); color: var(--navy); }
+
+  h3 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; border-bottom: 2px solid var(--teal-light); padding-bottom: 4px; }
+
+  p { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+
+  /* SUMMARY TABLE */
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .summary-table th {
+    background: var(--navy); color: white;
+    padding: 8px 10px; text-align: left; font-weight: 600;
+  }
+  .summary-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: var(--card-bg); }
+
+  /* DEGRADATION PILLS */
+  .deg-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .deg-pill {
+    background: var(--navy); color: #a0c4d8;
+    border-radius: 4px; padding: 4px 10px; font-size: 11.5px;
+  }
+
+  /* PIPELINE FLOW */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0;
+    overflow-x: auto;
+  }
+  .pipe-step {
+    flex: 1; min-width: 140px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    position: relative;
+  }
+  .pipe-step + .pipe-step { margin-left: 24px; }
+  .pipe-step + .pipe-step::before {
+    content: '▶';
+    position: absolute; left: -18px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--teal-light); font-size: 13px;
+  }
+  .pipe-step .pipe-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--teal); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; margin-bottom: 8px;
+  }
+  .pipe-step h4 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .pipe-step .method-label { font-size: 10px; color: var(--teal); font-weight: 700; text-transform: uppercase; margin-top: 8px; margin-bottom: 2px; }
+  .pipe-step .output-label { font-size: 10px; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-top: 6px; margin-bottom: 2px; }
+  .pipe-step p { font-size: 11.5px; color: var(--muted); margin: 0; }
+  .pipe-critical { border-color: var(--red); background: #fff8f8; }
+  .pipe-critical h4 { color: var(--red); }
+
+  @media (max-width: 700px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .pipeline { flex-direction: column; }
+    .pipe-step + .pipe-step { margin-left: 0; margin-top: 20px; }
+    .pipe-step + .pipe-step::before { left: 50%; top: -18px; transform: translateX(-50%) rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="ch-label">Chapter 4 · Biometric Systems</div>
+  <h1>Iris Recognition</h1>
+  <div class="subtitle">Introduction to Biometrics</div>
+  <div class="instructor">Instructor: Prof. Dr. Eman S. Al-Shamery</div>
+  <div class="cover-toc">
+    <div class="toc-pill">▸ Iris Anatomy</div>
+    <div class="toc-pill">▸ Image Acquisition</div>
+    <div class="toc-pill">▸ Segmentation (IDO &amp; GAC)</div>
+    <div class="toc-pill">▸ Normalization (Rubber Sheet)</div>
+    <div class="toc-pill">▸ Encoding &amp; Matching</div>
+    <div class="toc-pill">▸ Quality Assessment</div>
+    <div class="toc-pill">▸ Performance Evaluation</div>
+  </div>
+</div>
+
+<!-- ─── 4.1 ANATOMY ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.1</span>
+    <h2>Introduction — Iris Anatomy &amp; Uniqueness</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Multilayered Structure of the Iris</h3>
+        <div class="grid-2" style="gap:10px">
+          <div class="card dark">
+            <div class="num-badge">1</div>
+            <h4>Posterior Layer</h4>
+            <p>Two cells thick, heavily pigmented epithelial cells — impenetrable to light</p>
+          </div>
+          <div class="card dark">
+            <div class="num-badge">2</div>
+            <h4>Muscle Layer</h4>
+            <p>Sphincter &amp; dilator muscles — contracts/dilates the pupil in response to light</p>
+          </div>
+          <div class="card dark">
+            <div class="num-badge">3</div>
+            <h4>Stromal Layer</h4>
+            <p>Collagenous connective tissue + blood vessels (radial direction) — source of MOST texture</p>
+          </div>
+          <div class="card dark">
+            <div class="num-badge">4</div>
+            <h4>Anterior Border Layer</h4>
+            <p>Foremost visible layer; increased density of chromatophores — imaged by camera for recognition</p>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:12px; color:var(--muted)"><strong>Anatomical regions (inner→outer):</strong> Sclera · Ciliary Zone · Collarette · Pupillary Zone · Pupil</p>
+      </div>
+      <div>
+        <h3>Why the Iris is a Powerful Biometric</h3>
+        <ul class="feature-list">
+          <li>Texture arises from random morphogenesis during prenatal growth → each iris is unique</li>
+          <li>Even monozygotic (identical) twins exhibit different iris textures</li>
+          <li>Left iris ≠ Right iris of same person (epigenetic, not genetic)</li>
+          <li>Recognition uses <strong>TEXTURE detail</strong> — NOT iris color</li>
+          <li>Texture is a phenotypic trait with limited genetic penetrance</li>
+        </ul>
+        <div class="key-banner" style="margin-top:14px; border-radius:4px">⭐ Key: Recognition is based on the anterior iris texture (muscles + stromal + border layer) captured via NIR camera</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 4.1b ZONES ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.1</span>
+    <h2>Iris Zones, Texture Features &amp; Color</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Iris Zones</h3>
+        <div class="grid-2" style="gap:10px">
+          <div class="card dark">
+            <h4>Pupillary Zone</h4>
+            <p>Inner zone, surrounding the pupil. Contains radial furrows. More stable texture.</p>
+          </div>
+          <div class="card dark">
+            <h4>Ciliary Zone</h4>
+            <p>Outer zone extending to the limbus boundary. Contains contraction furrows (concentric lines visible when darkly pigmented).</p>
+          </div>
+          <div class="card dark">
+            <h4>Collarette</h4>
+            <p>Circular zigzag ridge separating the two zones. Crypts (Fuchs crypts) appear mainly around it.</p>
+          </div>
+          <div class="card dark">
+            <h4>Crypts (Fuchs)</h4>
+            <p>Pit-like irregular structures that allow fluids to enter/exit during pupil dilation. Visible when anterior layer thins.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>Key Texture Features</h3>
+        <ul class="feature-list">
+          <li><strong>Crypts</strong> — Pit-like irregular holes; main in collarette area</li>
+          <li><strong>Contraction Furrows</strong> — Concentric lines in ciliary zone; deepen when pupil dilates</li>
+          <li><strong>Radial Furrows</strong> — Radial lines in pupillary zone</li>
+          <li><strong>Rings</strong> — Concentric rings around pupil</li>
+          <li><strong>Vasculature</strong> — Blood vessels in stromal layer</li>
+          <li><strong>Freckles</strong> — Localized pigment deposits</li>
+        </ul>
+        <div class="key-banner" style="margin-top:14px; border-radius:4px">Color is genetically determined (melanin) but NOT used in recognition — only the anterior texture detail matters</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 4.2 SYSTEM DESIGN ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.2</span>
+    <h2>Iris Recognition System Design — 4 Modules</h2>
+  </div>
+  <div class="section-body">
+    <div class="info-box">Goal: Compare two irides → Generate a match score indicating degree of SIMILARITY or DISSIMILARITY (Pattern Matching System)</div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">1</div>
+        <h4>Acquisition</h4>
+        <div class="method-label">Method</div>
+        <p>Monochrome CCD camera + NIR illumination</p>
+        <div class="output-label">Output</div>
+        <p>Eye image (NIR)</p>
+      </div>
+      <div class="pipe-step pipe-critical">
+        <div class="pipe-num" style="background:var(--red)">2</div>
+        <h4>Segmentation</h4>
+        <span class="label red">Most Critical</span>
+        <div class="method-label">Method</div>
+        <p>Integro-Differential Operator or Geodesic Active Contours</p>
+        <div class="output-label">Output</div>
+        <p>Iris boundaries + Mask</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">3</div>
+        <h4>Normalization</h4>
+        <div class="method-label">Method</div>
+        <p>Daugman's Rubber Sheet Model (Cartesian → Polar coords)</p>
+        <div class="output-label">Output</div>
+        <p>Rectangular iris image</p>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">4</div>
+        <h4>Encoding &amp; Matching</h4>
+        <div class="method-label">Method</div>
+        <p>2D Gabor Wavelets → Phase quantization → Iris Code; Hamming Distance for matching</p>
+        <div class="output-label">Output</div>
+        <p>Match Score [0,1]</p>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:16px; border-radius:4px">Segmentation accuracy directly impacts matching performance — errors in localizing the iris can severely undermine system utility</div>
+  </div>
+</div>
+
+<!-- ─── 4.3 ACQUISITION ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.3</span>
+    <h2>Image Acquisition</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Sensor &amp; Setup</h3>
+        <ul class="feature-list">
+          <li>Monochrome CCD camera sensitive to Near-Infrared (NIR) spectrum</li>
+          <li>NIR illumination: wavelength 700 nm – 900 nm</li>
+          <li>External NIR light source co-located with camera</li>
+          <li>Captures series of images → quality-based selection</li>
+          <li>Most systems require cooperative subjects at close range (10–15 inches)</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Why NIR? (Two Key Advantages)</h3>
+        <div class="card" style="margin-bottom:8px">
+          <h4>① Texture Visibility</h4>
+          <p>Dark irides absorb visible light → RGB images do not clearly reveal texture. NIR penetrates the anterior iris layer, revealing hidden textural detail.</p>
+        </div>
+        <div class="card">
+          <h4>② Non-Intrusive</h4>
+          <p>NIR is invisible to the human eye → image acquisition causes no discomfort; safe when illumination power is properly controlled.</p>
+        </div>
+
+        <h3 style="margin-top:14px">Resolution Requirement</h3>
+        <ul class="feature-list">
+          <li>100–200 pixels across the iris in the radial direction</li>
+          <li>Quality-selected subset (often 1 image) sent for further processing</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Factors Degrading Image Quality</h3>
+        <ul class="feature-list">
+          <li>Partially closed eyelids</li>
+          <li>Intruding eyelashes (spurious edges)</li>
+          <li>Harsh or non-uniform illumination</li>
+          <li>Low resolution / large imaging distance</li>
+          <li>Extremely dilated or constricted pupil</li>
+          <li>Motion blur / defocus</li>
+          <li>Printed or fake contact lenses</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Commercial Devices (Examples)</h3>
+        <ul class="feature-list">
+          <li><strong>Panasonic BM-ET330</strong> — portable, 11.8–15.7 inch range, dual-eye</li>
+          <li><strong>LG IrisAccess 4000</strong> — auto-focus, wall-mount, 10.2–14.2 inch</li>
+          <li><strong>Oki IrisPass-M</strong> — wall-mount, 1–2 ft range</li>
+          <li><strong>Retica MobileEyes</strong> — hand-held dual-eye (2.8 lbs)</li>
+          <li><strong>IrisGuard IGH1000</strong> — hand-held, 4.7–11.8 inch, 750 g</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Advanced: Iris On The Move (IOM)</h3>
+        <div class="card accent-left">
+          <ul class="feature-list" style="padding:0">
+            <li>Acquires scans from moving subjects at considerable stand-off distance</li>
+            <li>Challenges: iris oscillates (hippus) within moving eyeball within moving head</li>
+            <li>Requires long-focal-length lenses + choke-point design</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">IOM systems represent the frontier — current research targets non-cooperative subjects under challenging illumination and large standoff distances</div>
+  </div>
+</div>
+
+<!-- ─── 4.4 SEGMENTATION ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.4</span>
+    <h2>Iris Segmentation — Overview &amp; Challenges</h2>
+  </div>
+  <div class="section-body">
+    <div class="warning-box">⚠ MOST CRITICAL MODULE — Inaccuracies in localizing the iris can SEVERELY impact matching accuracy and undermine system utility</div>
+    <div class="grid-2">
+      <div>
+        <h3>Goal &amp; Primary Task</h3>
+        <ul class="feature-list">
+          <li>Localize the spatial extent of the iris and isolate it from adjacent structures</li>
+          <li>Detect: <strong>INNER boundary</strong> (pupillary) &amp; <strong>OUTER boundary</strong> (limbus/sclera)</li>
+          <li>Remove: pupil, sclera, eyelids, eyelashes from the iris region</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Two Boundary Assumptions</h3>
+        <ul class="feature-list">
+          <li><strong>Pupillary boundary:</strong> strong intensity contrast (pupil vs iris) → relatively easy to detect</li>
+          <li><strong>Limbus boundary:</strong> contrast between iris and sclera → may be weaker in NIR; can be interrupted by eyelids</li>
+          <li>Assumption: both boundaries ≈ circles (though iris is not perfectly concentric with pupil)</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Post-Processing Steps</h3>
+        <ul class="feature-list">
+          <li>Eyelid detection: search for parabolic edge within the outer circle (spline fitting)</li>
+          <li>Eyelash detection: search for strong near-vertical edges in the segmented iris</li>
+          <li>Pupil center is NASAL (toward nose bridge) and INFERIOR (below) the iris center — not perfectly concentric</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Why Segmentation is Difficult</h3>
+        <div class="card" style="margin-bottom:10px">
+          <div class="num-badge">1</div>
+          <h4>Stochastic Texture</h4>
+          <p>The iris texture is highly irregular — it contains numerous "edge-like" features randomly distributed on its anterior surface. Simple appearance-based models cannot describe it.</p>
+        </div>
+        <div class="card" style="margin-bottom:10px">
+          <div class="num-badge">2</div>
+          <h4>Boundary Estimation Difficulty</h4>
+          <p>The limbus boundary may not be sharp; over-/under-segmentation risks if boundary detection is inaccurate. Eyelid boundary is irregularly shaped (not circular).</p>
+        </div>
+        <div class="card">
+          <div class="num-badge">3</div>
+          <h4>Eyelash Occlusion</h4>
+          <p>Eyelashes protrude into the iris image, generating spurious edges that interfere with boundary detection and texture extraction.</p>
+        </div>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">Methods: Integro-Differential Operator (assumes circular boundaries) | Geodesic Active Contours (handles irregular shapes)</div>
+  </div>
+</div>
+
+<!-- ─── 4.4.1 IDO ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.4.1</span>
+    <h2>Segmentation: Integro-Differential Operator</h2>
+  </div>
+  <div class="section-body">
+    <div class="eq-box">
+      <div class="eq-label">Equation (4.1)</div>
+      max(r, x₀, y₀) &nbsp; G<sub>σ</sub>(r) * ∂/∂r &nbsp; ∮ I(x,y) / 2πr &nbsp; ds
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>Term-by-Term Explanation</h3>
+        <table class="term-table">
+          <tr><td>I(x,y)</td><td>Input eye image — pixel intensity at location (x,y)</td></tr>
+          <tr><td>(x₀, y₀)</td><td>Center of the candidate circle</td></tr>
+          <tr><td>r</td><td>Radius of the candidate circle</td></tr>
+          <tr><td>∮ ds</td><td>Line integral along the circumference of the circle</td></tr>
+          <tr><td>∂/∂r</td><td>Radial derivative — measures intensity change (edge strength) at each point</td></tr>
+          <tr><td>1/2πr</td><td>Normalization factor by circle perimeter length</td></tr>
+          <tr><td>G<sub>σ</sub>(r)</td><td>Gaussian smoothing filter — blurs crypts, furrows, freckles to avoid spurious edges</td></tr>
+          <tr><td>max(r,x₀,y₀)</td><td>Maximize sum → find the circle with the strongest edge → true iris boundary</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>Algorithm — Step-by-Step</h3>
+        <ol class="step-list">
+          <li><span class="step-num">1</span><span>Apply Gaussian smoothing G<sub>σ</sub> → remove noise from crypts, freckles, furrows</span></li>
+          <li><span class="step-num">2</span><span>Select a candidate circle: center (x₀,y₀) and radius r</span></li>
+          <li><span class="step-num">3</span><span>For all pixels on the circumference → compute radial gradient ∂/∂r</span></li>
+          <li><span class="step-num">4</span><span>Sum all gradient values along perimeter, normalize by 2πr</span></li>
+          <li><span class="step-num">5</span><span>Repeat for many (r, x₀, y₀) combinations</span></li>
+          <li><span class="step-num">6</span><span>Select parameters yielding MAXIMUM sum → strongest circular edge = iris or pupil boundary</span></li>
+          <li><span class="step-num">7</span><span>Detect PUPIL boundary first (strong contrast), then LIMBUS boundary</span></li>
+          <li><span class="step-num">8</span><span>For limbus: integrate only over near-vertical arcs (ignore eyelid portions)</span></li>
+        </ol>
+        <div class="info-box" style="margin-top:10px">Note: Pupil center is nasal (shifted toward nose) and inferior (below) the iris center — iris and pupil are NOT concentric</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 4.4.2 GAC ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.4.2</span>
+    <h2>Segmentation: Geodesic Active Contours (GAC)</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Motivation — Why GAC?</h3>
+        <ul class="feature-list">
+          <li>Integro-Differential Operator assumes CIRCULAR boundary — fails when eyelids create irregular non-circular shapes</li>
+          <li>GAC uses active contours (snakes) that can detect irregular boundaries of ANY shape</li>
+          <li>GAC combines energy minimization (classical snakes) + geometric active contours (curve evolution)</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Level Set Formulation</h3>
+        <div class="card dark" style="margin-bottom:10px">
+          <p><strong>ψ(x,y)</strong> = signed distance from curve γ(t)</p>
+          <p style="margin-top:6px"><strong>ψ = 0</strong> → ON the curve &nbsp;|&nbsp; <strong>ψ &lt; 0</strong> → INSIDE &nbsp;|&nbsp; <strong>ψ &gt; 0</strong> → OUTSIDE</p>
+          <p style="margin-top:6px; font-style:italic; color:#8ab4c8">Curve γ(t) is the zeroth level set of the embedding function ψ</p>
+        </div>
+
+        <div class="eq-box">
+          <div class="eq-label">Evolution Equation (4.4)</div>
+          ψₜ = −K(c + εκ) |∇ψ| + ∇ψ · ∇K
+        </div>
+
+        <h3>Parameters</h3>
+        <table class="term-table">
+          <tr><td>K</td><td>Stopping function: decelerates curve evolution near the boundary</td></tr>
+          <tr><td>c</td><td>Inflation velocity: pushes curve outward toward object boundary</td></tr>
+          <tr><td>ε</td><td>Controls smoothness of level sets</td></tr>
+          <tr><td>κ</td><td>Curvature of level sets: provides smoothing constraints</td></tr>
+          <tr><td>∇K</td><td>Geodesic term: attracts curve toward boundary even with gaps in K</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>GAC Algorithm Steps</h3>
+        <ol class="step-list">
+          <li><span class="step-num">1</span><span>Detect pupillary boundary first (Integro-Differential or other method)</span></li>
+          <li><span class="step-num">2</span><span>Initialize contour γ(t=0) as a circle just beyond the pupillary boundary</span></li>
+          <li><span class="step-num">3</span><span>Initialize ψ as signed distance function to γ(0) (cone shape)</span></li>
+          <li><span class="step-num">4</span><span>Compute stopping function K(x,y) = 1/(1 + |∇(G*I)|^α / k^α)</span></li>
+          <li><span class="step-num">5</span><span>Modify K: delete pupillary boundary edges → prevent premature stopping</span></li>
+          <li><span class="step-num">6</span><span>Evolve ψ using Equation (4.7) iteratively (Δt = 0.05, c=0.65, ε=1)</span></li>
+          <li><span class="step-num">7</span><span>Upwind finite differences for velocity term (avoids singularities)</span></li>
+          <li><span class="step-num">8</span><span>Monitor thin plate spline energy: terminate when contour stabilizes</span></li>
+          <li><span class="step-num" style="background:var(--accent);color:var(--navy)">9</span><span>GAC can SPLIT at local minima (crypts, thick radial fibers) and MERGE → handles local minima unlike parametric methods</span></li>
+          <li><span class="step-num">10</span><span>Final contour = true limbus boundary</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">GAC vs IDO: IDO assumes circles (simple, fast) | GAC handles ANY shape (more accurate, more complex). Parameters: c=0.65, ε=1 for all iris images</div>
+  </div>
+</div>
+
+<!-- ─── 4.5 NORMALIZATION ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.5</span>
+    <h2>Iris Normalization — Daugman's Rubber Sheet Model</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Purpose of Normalization (3 Reasons)</h3>
+        <div class="card dark" style="margin-bottom:8px">
+          <span class="label accent">(a)</span>
+          <strong style="color:var(--accent)">Pupil Size Variation</strong>
+          <p style="margin-top:6px">Pupil contracts and dilates with illumination → changes the spatial extent of the iris texture; normalization removes this effect</p>
+        </div>
+        <div class="card dark" style="margin-bottom:8px">
+          <span class="label accent">(b)</span>
+          <strong style="color:var(--accent)">Cross-Population Consistency</strong>
+          <p style="margin-top:6px">Pupil size varies across individuals; normalization maps all irides to a common image domain of the same size</p>
+        </div>
+        <div class="card dark">
+          <span class="label accent">(c)</span>
+          <strong style="color:var(--accent)">Rotational Alignment</strong>
+          <p style="margin-top:6px">Two normalized irides can be registered by a simple TRANSLATION (shift) operation → accounts for head tilt during acquisition</p>
+        </div>
+      </div>
+      <div>
+        <h3>Daugman's Rubber Sheet Model — Remapping Equations</h3>
+        <div class="eq-box">
+          I(x(r,θ), y(r,θ)) → I(r,θ)<br><br>
+          x(r,θ) = (1−r)·x<sub>p</sub>(θ) + r·x<sub>l</sub>(θ)<br>
+          y(r,θ) = (1−r)·y<sub>p</sub>(θ) + r·y<sub>l</sub>(θ)<br><br>
+          r ∈ [0,1] &nbsp;,&nbsp; θ ∈ [0,2π]
+        </div>
+        <table class="term-table" style="margin-bottom:14px">
+          <tr><td>x<sub>p</sub>, y<sub>p</sub></td><td>Points sampled from the pupillary boundary</td></tr>
+          <tr><td>x<sub>l</sub>, y<sub>l</sub></td><td>Points sampled from the limbus boundary</td></tr>
+          <tr><td>r=0</td><td>Pupillary boundary &nbsp;|&nbsp; r=1 → Limbus boundary</td></tr>
+          <tr><td>Rows</td><td>Angular direction in original iris</td></tr>
+          <tr><td>Columns</td><td>Radial direction in original iris</td></tr>
+        </table>
+
+        <h3>Binary Noise Mask (Generated Alongside)</h3>
+        <ul class="feature-list">
+          <li>Label = 1 → valid iris pixel &nbsp;|&nbsp; Label = 0 → noise pixel (eyelid / eyelash)</li>
+          <li>Mask is also unwrapped (normalized) alongside the iris for faster matching</li>
+          <li>When using GAC: irregular boundary converted to circular estimate; excluded pixels added to mask</li>
+        </ul>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">Normalization converts the annular iris region from Cartesian (x,y) to pseudo-polar coordinates (r,θ) — the so-called 'unwrapping of the iris'</div>
+  </div>
+</div>
+
+<!-- ─── 4.6 ENCODING ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.6</span>
+    <h2>Iris Encoding — 2D Gabor Wavelets &amp; Iris Code</h2>
+  </div>
+  <div class="section-body">
+    <div class="eq-box">
+      <div class="eq-label">2D Gabor Wavelet</div>
+      G(x,y) = e<sup>−π[(x−x₀)²/α² + (y−y₀)²/β²]</sup> · e<sup>−2πi[u₀(x−x₀) + v₀(y−y₀)]</sup>
+    </div>
+    <div class="grid-2">
+      <div>
+        <h3>Encoding Pipeline</h3>
+        <ol class="step-list">
+          <li>
+            <span class="step-num">1</span>
+            <span><strong>Convolve with 2D Gabor Wavelet</strong><br>Multi-resolution filter applied to the normalized iris image. Wavelet in polar coords:<br>
+            <span style="font-family:monospace; font-size:11px">H(r,θ) = e<sup>−iω(θ−θ₀)</sup> · e<sup>−(r−r₀)²/α²</sup> · e<sup>−i(θ−θ₀)²/β²</sup></span></span>
+          </li>
+          <li><span class="step-num">2</span><span><strong>Complex Phasor Output</strong><br>Convolution yields complex values (real + imaginary) at each pixel location. Magnitude and phase are both computed.</span></li>
+          <li><span class="step-num">3</span><span><strong>Use PHASE only — Ignore Magnitude</strong><br>Phase is robust to illumination changes; magnitude varies with contrast. Only the phase quadrant is encoded → better generalization.</span></li>
+          <li><span class="step-num">4</span><span><strong>Quantize to 2 bits per pixel</strong><br>Phase quantized based on quadrant in complex plane (4 quadrants = 2 bits):<br>h<sub>Re</sub> = sign(Re{…}) &nbsp;|&nbsp; h<sub>Im</sub> = sign(Im{…})</span></li>
+          <li><span class="step-num">5</span><span><strong>Result: Iris Code</strong><br>2D binary matrix (common dimension: 2048 bits). Entire iris texture represented as a compact binary code.</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>Matching — Hamming Distance</h3>
+        <div class="eq-box">
+          <div class="eq-label">Formula</div>
+          HD = [ (IrisCodeA ⊕ IrisCodeB) ∩ MaskA ∩ MaskB ]<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;────────────────────────────────<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MaskA ∩ MaskB
+        </div>
+        <table class="term-table" style="margin-bottom:14px">
+          <tr><td>⊕ (XOR)</td><td>Detects all bit disagreements between two iris codes</td></tr>
+          <tr><td>∩ (AND)</td><td>Masks noisy / invalid regions (eyelashes, eyelids)</td></tr>
+          <tr><td>Denominator</td><td>Normalizes total number of valid bits compared → HD ∈ [0,1]</td></tr>
+          <tr><td>HD = 0</td><td>Perfect match (identical iris codes)</td></tr>
+          <tr><td>HD ≈ 0.5</td><td>Two different (random) irides → bits differ ~50% by chance</td></tr>
+          <tr><td>Registration</td><td>Before computing HD: shift iris codes to align (head tilt correction)</td></tr>
+        </table>
+        <div class="key-banner" style="border-radius:4px">⭐ Why phase not magnitude? Phase is illumination-invariant | Why Gabor? Iris texture exists at MULTIPLE scales → wavelet multi-resolution analysis is ideal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 4.7 QUALITY ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.7</span>
+    <h2>Iris Image Quality Assessment</h2>
+  </div>
+  <div class="section-body">
+    <p>Quality evaluation is based on factors that DEGRADE or REDUCE the usable iris region. <strong>8 Key Degradation Factors:</strong></p>
+    <div class="deg-pills">
+      <div class="deg-pill">(a) Occlusion</div>
+      <div class="deg-pill">(b) Defocus</div>
+      <div class="deg-pill">(c) Motion Blur</div>
+      <div class="deg-pill">(d) Non-uniform Illumination</div>
+      <div class="deg-pill">(e) Low Resolution</div>
+      <div class="deg-pill">(f) Iris Dilation</div>
+      <div class="deg-pill">(g) Off-Angle Imaging</div>
+      <div class="deg-pill">(h) Printed Contact Lenses</div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom:10px">
+          <div class="num-badge">1</div>
+          <h4>Gradient-Based Sharpness</h4>
+          <div class="eq-box" style="margin:6px 0; font-size:12px; padding:7px 12px">1/w = S / (Mᵢ − Mₚ)</div>
+          <p>Region of interest: pixels near pupillary boundary. Compute median intensities M<sub>p</sub> (pupil) and M<sub>i</sub> (iris). Collect top 20 absolute horizontal gradients → average = S. Sharpness: 1/w = S/H where H = M<sub>i</sub>−M<sub>p</sub>. Threshold: 1/w &gt; 0.5 → good quality.</p>
+        </div>
+        <div class="card">
+          <div class="num-badge">3</div>
+          <h4>Local Fourier Spectral Analysis</h4>
+          <div class="eq-box" style="margin:6px 0; font-size:12px; padding:7px 12px">D = [ (F₁+F₂+F₃) ; F₂/(F₁+F₃) ]</div>
+          <p>Two 64×64 local regions selected from iris. Quality descriptor D = (F₁+F₂+F₃ ; F₂/(F₁+F₃)) where F<sub>i</sub> is power in low/middle/high frequency bands. Focused image: high F₂/F₁+F₃ ratio. Mean of two local descriptors = final quality measure.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:10px">
+          <div class="num-badge">2</div>
+          <h4>Fourier High-Frequency Energy</h4>
+          <div class="eq-box" style="margin:6px 0; font-size:12px; padding:7px 12px">D<sub>σ</sub>(μ,ν) = exp(−(μ²+ν²)/σ²) · F(μ,ν)</div>
+          <p>Defocusing attenuates highest frequencies (exponential decay). Measure total power at high spatial frequencies in 2D Fourier domain. Make measure image-content-independent: ratio of high-frequency band power to low-frequency band power.</p>
+        </div>
+        <div class="card">
+          <div class="num-badge">4</div>
+          <h4>Wavelet-Based Band Energy (Quality-Weighted HD)</h4>
+          <div class="eq-box" style="margin:6px 0; font-size:12px; padding:7px 12px">HDw = Σ(E<sub>X</sub>·E<sub>Y</sub>·XOR) / Σ(E<sub>X</sub>·E<sub>Y</sub>)</div>
+          <p>Mexican hat wavelet CWT applied at 3 scales (s₁,s₂,s₃). Product response: w<sub>mul</sub> = w(s₁)×w(s₂)×w(s₃). Band energy E<sub>t</sub> = (1/N<sub>t</sub>)Σ|w<sub>mul</sub>|². Quality index Q = (1/T)Σm<sub>t</sub>·log(E<sub>t</sub>) with Gaussian weights m<sub>t</sub> (inner iris weighted higher).</p>
+        </div>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">Key Insight: Good iris image = Sharp + Rich texture + High frequency content | Wavelet technique uses HIGHER weights for INNER iris (more stable, less occlusion)</div>
+  </div>
+</div>
+
+<!-- ─── 4.8 PERFORMANCE ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">4.8</span>
+    <h2>Performance Evaluation &amp; Real-World Challenges</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div>
+        <h3>Large-Scale Experimental Results 🔥</h3>
+        <div class="card dark" style="margin-bottom:10px">
+          <ul class="feature-list" style="padding:0">
+            <li style="color:#b0c8d8">Dataset: 632,500 iris images from 316,250 individuals spanning 152 nationalities (Daugman)</li>
+            <li style="color:#b0c8d8">Result: near-ZERO error rates are achievable — but ONLY with high-quality images</li>
+            <li style="color:#b0c8d8">Quality of iris image must be strictly monitored to ensure textural clarity</li>
+          </ul>
+        </div>
+
+        <h3>NIST 2006 Performance Benchmarks</h3>
+        <table class="summary-table" style="margin-bottom:14px">
+          <tr><th>Metric</th><th>Definition</th><th>NIST Value</th></tr>
+          <tr><td><strong>FMR</strong></td><td>Different persons matched as same</td><td>0.1%</td></tr>
+          <tr><td><strong>FNMR</strong></td><td>Same person rejected as different</td><td>1.1% – 1.4%</td></tr>
+        </table>
+
+        <h3>Key Performance Takeaways</h3>
+        <ul class="feature-list">
+          <li>Iris texture is substantially diverse across the population → high discrimination power</li>
+          <li>Even monozygotic twin irides show structural differences → uniqueness is epigenetic</li>
+          <li>Performance is highly dependent on IMAGE QUALITY — poor images → higher FNMR</li>
+          <li>At HD threshold of ~0.32: optimal balance between FMR and FNMR</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Real-World Challenges in Iris Recognition</h3>
+        <div class="card red-left" style="margin-bottom:8px">
+          <h4 style="color:var(--red)">Acquisition Difficulty</h4>
+          <p>Iris is small + slightly oscillating (hippus) within moving eyeball within moving head → very hard to capture from distance</p>
+        </div>
+        <div class="card red-left" style="margin-bottom:8px">
+          <h4 style="color:var(--red)">Image Quality Degradation</h4>
+          <p>Motion blur, defocus, eyelashes/eyelids, non-uniform illumination, off-axis gaze → increases FNMR significantly</p>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <h4>Off-Angle Imaging</h4>
+          <p>Eye not looking directly at camera → geometric distortion; requires correction models</p>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <h4>No Theoretical Uniqueness Proof</h4>
+          <p>Iris uniqueness is demonstrated EXPERIMENTALLY — no rigorous mathematical proof of individuality exists yet</p>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <h4>Distance &amp; Non-Cooperative</h4>
+          <p>Traditional systems require close-range cooperative subjects; Iris-On-The-Move still an open research challenge</p>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <h4>Multimodal Integration</h4>
+          <p>Combining iris with face, skin texture, or periocular region (eye surroundings) to improve accuracy</p>
+        </div>
+        <div class="card">
+          <h4>Security &amp; Privacy</h4>
+          <p>Large template databases risk data leakage and identity theft → Cancelable biometrics and privacy-preserving techniques needed</p>
+        </div>
+      </div>
+    </div>
+    <div class="key-banner" style="margin-top:14px; border-radius:4px">Applications: Airports (UAE expellee identification) | Coal mines (fingerprints impractical) | Border control | High-security access | Forensics</div>
+  </div>
+</div>
+
+<!-- ─── SUMMARY TABLE ─── -->
+<div class="section">
+  <div class="section-header">
+    <span class="sec-num">★</span>
+    <h2>Chapter 4 — Complete Summary (Exam-Ready Reference)</h2>
+  </div>
+  <div class="section-body" style="padding:0">
+    <table class="summary-table" style="font-size:12px">
+      <tr>
+        <th>Module</th>
+        <th>Key Method</th>
+        <th>Input → Output</th>
+        <th>Critical Notes</th>
+      </tr>
+      <tr>
+        <td><strong>Acquisition</strong></td>
+        <td>Monochrome CCD + NIR (700–900nm)</td>
+        <td>Eye scene → NIR eye image</td>
+        <td>100–200 px radial resolution; multiple images, quality-selected</td>
+      </tr>
+      <tr>
+        <td><strong>Segmentation</strong></td>
+        <td>Integro-Differential Operator or Geodesic Active Contours</td>
+        <td>Eye image → Iris region + Binary Mask</td>
+        <td>MOST CRITICAL; IDO assumes circles; GAC handles any shape</td>
+      </tr>
+      <tr>
+        <td><strong>Normalization</strong></td>
+        <td>Daugman's Rubber Sheet Model</td>
+        <td>Annular iris → Rectangular (r,θ)</td>
+        <td>3 purposes: pupil variation, common domain, rotation alignment</td>
+      </tr>
+      <tr>
+        <td><strong>Encoding</strong></td>
+        <td>2D Gabor Wavelets → Phase Quantization</td>
+        <td>Rectangular iris → Iris Code (binary)</td>
+        <td>Use PHASE only (illumination-invariant); 2 bits/pixel; 2048 bits</td>
+      </tr>
+      <tr>
+        <td><strong>Matching</strong></td>
+        <td>Hamming Distance (HD)</td>
+        <td>Two iris codes → Match score [0,1]</td>
+        <td>Uses binary mask; HD=0 → perfect match; HD≈0.5 → random pair</td>
+      </tr>
+      <tr>
+        <td><strong>Quality</strong></td>
+        <td>Gradient / Fourier / Wavelet Band Energy (Mexican hat CWT)</td>
+        <td>Iris image → Quality score</td>
+        <td>Inner iris weighted higher; Q threshold → accept/reject image</td>
+      </tr>
+      <tr>
+        <td><strong>Performance</strong></td>
+        <td>NIST 2006 benchmark</td>
+        <td>FMR=0.1% at FNMR=1.1–1.4%</td>
+        <td>Based on 632,500 images / 316,250 persons; zero-error ⭐ possible with ideal quality</td>
+      </tr>
+    </table>
+    <div class="key-banner" style="border-radius:0 0 6px 6px">Most Critical: Segmentation | Why Phase? Illumination-invariant | Why Gabor? Multi-scale iris texture | Why NIR? Dark iris texture visibility + non-intrusive</div>
+  </div>
+</div>
+
+<div style="height:32px"></div>
+
+</body>
+</html>
