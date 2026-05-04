@@ -665,7 +665,7 @@
           <li><span class="step-num">2</span><span>Initialize contour γ(t=0) as a circle just beyond the pupillary boundary</span></li>
           <li><span class="step-num">3</span><span>Initialize ψ as signed distance function to γ(0) (cone shape)</span></li>
           <li><span class="step-num">4</span><span>Compute stopping function K(x,y) = 1/(1 + |∇(G*I)|^α / k^α)</span></li>
-          <li><span class="step-num">5</span><span>Modify K: delete pupillary boundary edges → prevent premature stopping</span></li>
+          <li><span class="step-num">5</span><span>Modify K: delete pupillary boundary edges → prevent early stopping</span></li>
           <li><span class="step-num">6</span><span>Evolve ψ using Equation (4.7) iteratively (Δt = 0.05, c=0.65, ε=1)</span></li>
           <li><span class="step-num">7</span><span>Upwind finite differences for velocity term (avoids singularities)</span></li>
           <li><span class="step-num">8</span><span>Monitor thin plate spline energy: terminate when contour stabilizes</span></li>
